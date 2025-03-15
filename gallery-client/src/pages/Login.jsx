@@ -20,7 +20,40 @@ const Login = () => {
   };
 
 
-  
+  const handleSubmit= async(e)=>{
+    e.preventDefault();
+    setError('');
+
+    const formDataSubmit = new FormData();
+    formDataSubmit.append('email', formData.email);
+    formDataSubmit.append('password', formData.password);
+
+    try{
+        const response = await axios.post("http://localhost:80/gallery-app/gallery-server/apis/v1/login.php", formDataSubmit);
+        console.log("Login successful: ",response.data);
+
+        if (response.data.success) {
+
+          console.log("Login successful:", response.data);
+            // Store user data in localStorage
+            
+            localStorage.setItem('userId', response.data.user.id);
+            localStorage.setItem('userName', response.data.user.full_name);
+        
+        navigate('/gallery');
+        }
+        else {
+          console.log("Login failed:", response.data.message);
+          setError(response.data.message);
+        }
+    }
+    catch(error){
+        console.error('Login error: ',error)
+        setError('Server error. Please try again later.');
+
+    }
+
+  }
 
   return(
   <div className='login-outer-container'>
@@ -45,6 +78,7 @@ const Login = () => {
               name="password" 
               placeholder="Enter Your Password" 
               value={formData.password}
+              onChange={handleChange}
               required 
             />
             <input 
