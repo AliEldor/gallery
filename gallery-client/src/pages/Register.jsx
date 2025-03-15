@@ -3,7 +3,24 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import config from "../config/config";
 
+const Register = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    fullname: "",
+    email: "",
+    password: "",
+  });
 
+  const [error, setError] = useState('');
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  
 
   return (
     <div className="login-outer-container">
