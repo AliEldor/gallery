@@ -20,7 +20,34 @@ const Register = () => {
     });
   };
 
-  
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    const formDataSubmit = new FormData();
+    formDataSubmit.append("fullname", formData.fullname);
+    formDataSubmit.append("email", formData.email);
+    formDataSubmit.append("password", formData.password);
+
+    try {
+      const response = await axios.post(
+        "http://localhost:80/gallery-app/gallery-server/apis/v1/register.php",
+        formDataSubmit
+      );
+      if (response.data.success) {
+        console.log('Registration successful:', response.data);
+        navigate('/');
+      }
+      else {
+        console.error('Registration failed:', response.data.message);
+        
+        setError(response.data.message);
+      }
+    }
+    catch (error) {
+        console.error('Registration error:', error.response?.data || error.message);
+        setError('Server error. Please try again later.');
+      }
+  };
 
   return (
     <div className="login-outer-container">
@@ -30,7 +57,7 @@ const Register = () => {
           <form
             id="register-form"
             className="login-items"
-            
+            onSubmit={handleSubmit}
           >
             <label htmlFor="fullname">Name</label>
             <input
@@ -39,7 +66,7 @@ const Register = () => {
               name="fullname"
               placeholder="Enter your name"
               value={formData.fullname}
-              
+              onChange={handleChange}
               required
             />
             <label htmlFor="email">Email</label>
@@ -49,7 +76,7 @@ const Register = () => {
               name="email"
               placeholder="Enter your email"
               value={formData.email}
-              
+              onChange={handleChange}
               required
             />
             <label htmlFor="password">Password</label>
@@ -59,7 +86,7 @@ const Register = () => {
               name="password"
               placeholder="Enter password"
               value={formData.password}
-              
+              onChange={handleChange}
               required
             />
             <input type="submit" className="login-btn" value="Register" />
