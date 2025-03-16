@@ -1,7 +1,68 @@
 import React, { useState } from 'react';
 import '../styles/photoModal.css';
 
+const EditPhotoModal = ({ photo, onEdit, onClose }) => {
+  const [formData, setFormData] = useState({
+    title: photo.title,
+    description: photo.description,
+    tags: photo.tags.join(', '),
+    imageUrl: photo.imageUrl
+  });
+  const [previewUrl, setPreviewUrl] = useState(photo.imageUrl);
+  const [error, setError] = useState('');
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+  };
+
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreviewUrl(reader.result);
+        setFormData({
+          ...formData,
+          imageUrl: reader.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    setError('');
+
+    // Validation
+    if (!formData.title.trim()) {
+      setError('Title is required');
+      return;
+    }
+
+    // Process tags 
+    const processedTags = formData.tags
+      ? formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== '')
+      : [];
+
+    // Create updated photo object
+    const updatedPhoto = {
+      ...photo,
+      title: formData.title,
+      description: formData.description,
+      tags: processedTags,
+      imageUrl: formData.imageUrl,
+      updatedAt: new Date().toISOString()
+    };
+
+    onEdit(updatedPhoto);
+    onClose();
+  };
 
   return (
     <div className="modal-overlay">
@@ -21,7 +82,7 @@ import '../styles/photoModal.css';
               id="title"
               name="title"
               value={formData.title}
-              
+              onChange={handleChange}
               required
             />
           </div>
@@ -32,7 +93,7 @@ import '../styles/photoModal.css';
               id="description"
               name="description"
               value={formData.description}
-              
+              onChange={handleChange}
               rows="4"
             />
           </div>
@@ -44,7 +105,7 @@ import '../styles/photoModal.css';
               id="tags"
               name="tags"
               value={formData.tags}
-              
+              onChange={handleChange}
               placeholder="nature, vacation, family, etc."
             />
           </div>
@@ -56,7 +117,7 @@ import '../styles/photoModal.css';
               id="image"
               name="image"
               accept="image/*"
-              
+              onChange={handleImageChange}
             />
           </div>
 
