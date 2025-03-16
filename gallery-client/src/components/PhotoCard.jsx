@@ -91,7 +91,13 @@ const PhotoCard = ({ photo, onEdit, onDelete }) => {
           </div>
         </div>
   
-        
+        {isEditModalOpen && (
+          <EditPhotoModal 
+            photo={photo} 
+            onEdit={handleEditPhoto} 
+            onClose={closeEditModal} 
+          />
+        )}
       </>
     );
   };
