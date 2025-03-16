@@ -40,7 +40,56 @@ const GalleryPage = () => {
     navigate('/login');
   };
 
-  
+  const handleAddPhoto = (newPhoto) => {
+    const updatedPhotos = [...photos, { ...newPhoto, id: Date.now() }];
+    setPhotos(updatedPhotos);
+    localStorage.setItem('userPhotos', JSON.stringify(updatedPhotos));
+    
+    // Update tags
+    const newTags = new Set([...allTags]);
+    newPhoto.tags.forEach(tag => newTags.add(tag));
+    setAllTags(Array.from(newTags));
+  };
+
+  const handleEditPhoto = (editedPhoto) => {
+    const updatedPhotos = photos.map(photo => 
+      photo.id === editedPhoto.id ? editedPhoto : photo
+    );
+    setPhotos(updatedPhotos);
+    localStorage.setItem('userPhotos', JSON.stringify(updatedPhotos));
+    
+    // Update tags
+    const tags = new Set();
+    updatedPhotos.forEach(photo => {
+      photo.tags.forEach(tag => tags.add(tag));
+    });
+    setAllTags(Array.from(tags));
+  };
+
+  const handleDeletePhoto = (photoId) => {
+    const updatedPhotos = photos.filter(photo => photo.id !== photoId);
+    setPhotos(updatedPhotos);
+    localStorage.setItem('userPhotos', JSON.stringify(updatedPhotos));
+    
+    // Update tags
+    const tags = new Set();
+    updatedPhotos.forEach(photo => {
+      photo.tags.forEach(tag => tags.add(tag));
+    });
+    setAllTags(Array.from(tags));
+  };
+
+  // Filter photos
+  const filteredPhotos = photos.filter(photo => {
+    const matchesSearch = searchTerm === '' || 
+      photo.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      photo.description.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesTags = selectedTags.length === 0 || 
+      selectedTags.every(tag => photo.tags.includes(tag));
+    
+    return matchesSearch && matchesTags;
+  });
 
   return (
     <div className="gallery-container">
